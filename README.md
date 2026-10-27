@@ -51,9 +51,9 @@ Lưu ý: Các hướng dẫn chạy ứng dụng sẽ được cập nhật sau 
 
 6. Các đường link nộp bài
 
-GitHub Repository: CHUA_CAP_NHAT
-Docker Hub Backend: CHUA_CAP_NHAT
-Docker Hub Frontend: CHUA_CAP_NHAT
-Render App: CHUA_CAP_NHAT
-Render API: CHUA_CAP_NHAT
-MongoDB Atlas: CHUA_CAP_NHAT
+GitHub Repository: https://github.com/s238050-GiaBinh/238050_HongPhanGiaBinh.git
+Docker Hub Backend: https://hub.docker.com/r/giabinhs238050/backend
+Docker Hub Frontend: https://hub.docker.com/r/giabinhs238050/frontend
+Render App: https://web-238050.onrender.com
+Render API: https://api-238050.onrender.com
+MongoDB Atlas: mongodb+srv://binhlmk123:Binhlmk123@cluster0.gochoui.mongodb.net/238050_HongPhanGiaBinh?retryWrites=true&w=majority
