@@ -5,28 +5,37 @@ const Employee = require("../models/Employee");
 
 const router = express.Router();
 
+// Kiểm tra mã nhân viên
 function isValidEmployeeId(id) {
-  return /^[a-zA-Z0-9_-]+$/.test(id);
+  return typeof id === "string" &&
+    /^[a-zA-Z0-9_-]+$/.test(id.trim());
 }
 
+// Tránh ký tự tìm kiếm làm sai biểu thức chính quy
 function escapeRegex(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// Tìm nhân viên theo MongoDB ID hoặc mã nhân viên
 function findEmployee(id) {
   if (mongoose.isValidObjectId(id)) {
     return Employee.findOne({
-      $or: [{ _id: id }, { employeeId: id }]
+      $or: [
+        { _id: id },
+        { employeeId: id }
+      ]
     });
   }
 
   return Employee.findOne({ employeeId: id });
 }
 
+// Xử lý lỗi và trả về thông báo chi tiết
 function handleError(res, error) {
   if (error.code === 11000) {
     return res.status(409).json({
-      message: "Mã nhân viên đã tồn tại"
+      message: "Mã nhân viên hoặc email đã tồn tại",
+      details: error.keyValue || {}
     });
   }
 
@@ -39,10 +48,18 @@ function handleError(res, error) {
     });
   }
 
-  console.error(error);
+  if (error.name === "CastError") {
+    return res.status(400).json({
+      message: "Giá trị dữ liệu không đúng định dạng",
+      details: error.message
+    });
+  }
+
+  console.error("Lỗi API nhân viên:", error);
 
   return res.status(500).json({
-    message: "Lỗi máy chủ"
+    message: "Lỗi máy chủ",
+    details: error.message
   });
 }
 
@@ -52,7 +69,7 @@ router.get("/", async function (req, res) {
     const search = String(req.query.search || "").trim();
     let employees;
 
-    if (search.length > 0) {
+    if (search) {
       const keyword = new RegExp(escapeRegex(search), "i");
 
       employees = await Employee.find({
@@ -98,7 +115,18 @@ router.get("/:id", async function (req, res) {
 // POST /api/employees
 router.post("/", async function (req, res) {
   try {
-    const employee = new Employee(req.body);
+    const body = req.body || {};
+
+    if (!isValidEmployeeId(body.employeeId)) {
+      return res.status(400).json({
+        message: "Mã nhân viên không hợp lệ",
+        errors: [
+          "Mã nhân viên chỉ được chứa chữ cái, chữ số, dấu gạch ngang hoặc gạch dưới."
+        ]
+      });
+    }
+
+    const employee = new Employee(body);
     const savedEmployee = await employee.save();
 
     return res.status(201).json({
@@ -114,9 +142,12 @@ router.post("/", async function (req, res) {
 router.put("/:id", async function (req, res) {
   try {
     const id = req.params.id;
+    const body = req.body || {};
 
-    if (req.body.employeeId !== undefined &&
-        !isValidEmployeeId(req.body.employeeId)) {
+    if (
+      body.employeeId !== undefined &&
+      !isValidEmployeeId(body.employeeId)
+    ) {
       return res.status(400).json({
         message: "Mã nhân viên không hợp lệ"
       });
@@ -146,8 +177,8 @@ router.put("/:id", async function (req, res) {
     for (let i = 0; i < allowedFields.length; i++) {
       const field = allowedFields[i];
 
-      if (req.body[field] !== undefined) {
-        employee[field] = req.body[field];
+      if (body[field] !== undefined) {
+        employee[field] = body[field];
       }
     }
 
