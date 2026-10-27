@@ -20,6 +20,15 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.get("/", function (req, res) {
+  res.status(200).json({
+    message: "He thong quan ly nhan vien API",
+    status: "OK",
+    health: "/health",
+    employees: "/api/employees"
+  });
+});
+
 // Cho phép Backend đọc dữ liệu JSON
 app.use(express.json());
 
