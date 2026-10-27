@@ -25,10 +25,12 @@ const employeeSchema = new mongoose.Schema(
     },
     department: {
       type: String,
+      trim: true,
       default: ""
     },
     position: {
       type: String,
+      trim: true,
       default: ""
     },
     email: {
@@ -43,6 +45,7 @@ const employeeSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
+      trim: true,
       default: ""
     },
     hireDate: {
@@ -51,6 +54,7 @@ const employeeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
+      trim: true,
       default: "Đang làm việc"
     }
   },
