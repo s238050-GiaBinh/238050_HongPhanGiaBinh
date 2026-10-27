@@ -8,8 +8,18 @@ const employeeRoutes = require("./routes/employees");
 
 const app = express();
 
+const cors = require("cors");
+
+// Lấy địa chỉ Frontend từ biến môi trường
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.FRONTEND_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173"
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 app.use(express.json());
